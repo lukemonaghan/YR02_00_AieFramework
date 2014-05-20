@@ -212,6 +212,7 @@ namespace Osiris{
 		return true;		
 	}
 	bool AABB_Box		(AxisBox *s_Shape1	, Box		*s_Shape2	, glm::vec3 &v3_CollisionPoint){
+		// Call box box
 		return false;
 	}
 	bool AABB_Plane		(AxisBox *s_Shape1	, Plane		*s_Shape2	, glm::vec3 &v3_CollisionPoint){
@@ -220,40 +221,41 @@ namespace Osiris{
 		a2 = s_Shape2->getType();
 		
 		glm::vec3 s1Pos = s_Shape1->getModel()[3].xyz;
-		glm::vec3 s1Extents = s_Shape1->getExtents() + glm::vec3(0.1f); //@MAGIC fix
+		glm::vec3 s2Pos = s_Shape2->getModel()[3].xyz;
+		glm::vec3 s1Extents = s_Shape1->getExtents();
 
 		//v3_CollisionPoint = s_Shape2->getModel()[3].xyz;
-		v3_CollisionPoint.x = (s_Shape2->getUp().x != 0.0f) ? s1Pos.x + (s1Extents.x * s_Shape2->getUp().x ) : 0.0f ;
-		v3_CollisionPoint.y = (s_Shape2->getUp().y != 0.0f) ? s1Pos.y + (s1Extents.y * s_Shape2->getUp().y ) : 0.0f ;
-		v3_CollisionPoint.z = (s_Shape2->getUp().z != 0.0f) ? s1Pos.z + (s1Extents.z * s_Shape2->getUp().z ) : 0.0f ;
+		v3_CollisionPoint.x = (s_Shape2->getUp().x != 0.0f) ? s1Pos.x + (s1Extents.x * s_Shape2->getUp().x ) : 0.0f;
+		v3_CollisionPoint.y = (s_Shape2->getUp().y != 0.0f) ? s1Pos.y + (s1Extents.y * s_Shape2->getUp().y ) : 0.0f;
+		v3_CollisionPoint.z = (s_Shape2->getUp().z != 0.0f) ? s1Pos.z + (s1Extents.z * s_Shape2->getUp().z ) : 0.0f;
 
 		if (s_Shape2->getUp().x != 0.0f){
 			if (s_Shape2->getUp().x < 0.0f){
-				if (s1Pos.x - s1Extents.x >= s_Shape2->getModel()[3].x || s1Pos.x + s1Extents.x >= s_Shape2->getModel()[3].x){
+				if (s1Pos.x - s1Extents.x >= s2Pos.x || s1Pos.x + s1Extents.x >= s2Pos.x){
 					return true;
 				}
 			}else{
-				if (s1Pos.x - s1Extents.x <= s_Shape2->getModel()[3].x || s1Pos.x + s1Extents.x <= s_Shape2->getModel()[3].x){
+				if (s1Pos.x - s1Extents.x <= s2Pos.x || s1Pos.x + s1Extents.x <= s2Pos.x){
 					return true;
 				}
 			}
 		}else if (s_Shape2->getUp().y != 0.0f){
 			if (s_Shape2->getUp().y < 0.0f){
-				if (s1Pos.y - s1Extents.y >= s_Shape2->getModel()[3].y || s1Pos.y + s1Extents.y >= s_Shape2->getModel()[3].y){
+				if (s1Pos.y - s1Extents.y >= s2Pos.y || s1Pos.y + s1Extents.y >= s2Pos.y){
 					return true;
 				}
 			}else{
-				if (s1Pos.y - s1Extents.y <= s_Shape2->getModel()[3].y || s1Pos.y + s1Extents.y <= s_Shape2->getModel()[3].y){
+				if (s1Pos.y - s1Extents.y <= s2Pos.y || s1Pos.y + s1Extents.y <= s2Pos.y){
 					return true;
 				}
 			}
 		}else if (s_Shape2->getUp().z != 0.0f){
 			if (s_Shape2->getUp().z < 0.0f){
-				if (s1Pos.z - s1Extents.z >= s_Shape2->getModel()[3].z || s1Pos.z + s1Extents.z >= s_Shape2->getModel()[3].z){
+				if (s1Pos.z - s1Extents.z >= s2Pos.z || s1Pos.z + s1Extents.z >= s2Pos.z){
 					return true;
 				}
 			}else{
-				if (s1Pos.z - s1Extents.z <= s_Shape2->getModel()[3].z || s1Pos.z + s1Extents.z <= s_Shape2->getModel()[3].z){
+				if (s1Pos.z - s1Extents.z <= s2Pos.z || s1Pos.z + s1Extents.z <= s2Pos.z){
 					return true;
 				}
 			}
