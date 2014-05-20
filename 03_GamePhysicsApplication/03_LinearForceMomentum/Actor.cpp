@@ -144,7 +144,7 @@ namespace Osiris{
 	ActorDynamic::ActorDynamic(){
 		aType = ActorType::DYNAMIC;
 		v3Velocity = glm::vec3(0);
-		v3Friction = glm::vec3(0.0001f);
+		v3Friction = glm::vec3(0.0f);
 		v3Damping = glm::vec3(0.1f);
 		// Add our Line from oldpos to new pos
 		Line *l = new Line();
@@ -203,7 +203,7 @@ namespace Osiris{
 				bActive = false;
 			} else {
 				glm::vec3 OldPos = v3Translate;
-				v3Velocity *= glm::vec3(1.0f) - v3Friction;
+				v3Velocity *= glm::vec3(1.0f);
 				addTranslate(v3Velocity * f_timeStepInterval);
 				((Line*)vShapes[1])->setDirection(OldPos - v3Translate);
 				((Line*)vShapes[1])->setDistance(glm::distance(OldPos,v3Translate));

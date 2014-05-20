@@ -12,7 +12,7 @@ namespace Osiris{
 	class Scene;
 
 	enum ActorType { STATIC, DYNAMIC };
-	#define ACTORTYPE(type) (type == ActorType::STATIC) ? "STATIC" : "DYNAMIC";
+	#define ACTORTYPE(type) ((type == ActorType::STATIC) ? "STATIC" : "DYNAMIC")
 	typedef std::vector<Shape*> ShapeVector;
 
 	class Actor : public _Base {

@@ -11,7 +11,7 @@ namespace Osiris{
 	//!--SHAPES
 
 	enum ShapeType { AABB, SPHERE, BOX, PLANE, RAY, LINE, MESH };
-	#define SHAPETYPE(type) (type == ShapeType::SPHERE) ? "SPHERE" : (type == ShapeType::BOX) ? "BOX" : (type == ShapeType::PLANE) ? "PLANE" : "MESH";
+	#define SHAPETYPE(type) ((type == ShapeType::AABB) ? "AABB" : (type == ShapeType::SPHERE) ? "SPHERE" : (type == ShapeType::BOX) ? "BOX" : (type == ShapeType::PLANE) ? "PLANE" : (type == ShapeType::RAY) ? "RAY" : (type == ShapeType::LINE) ? "LINE" : "MESH")
 
 	class Shape : public _Base {
 	public:

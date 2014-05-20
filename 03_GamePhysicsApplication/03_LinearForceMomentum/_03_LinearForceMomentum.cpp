@@ -23,6 +23,7 @@ void AddSphere(const glm::mat4& m4_Camera,float f_Power){
 	Osiris::ActorDynamic *bulletActor = new Osiris::ActorDynamic();
 	bulletActor->setTranslate(m4_Camera[3].xyz);
 	bulletActor->setVelocity(glm::vec3(m4_Camera[2].x * -f_Power,m4_Camera[2].y * -f_Power,m4_Camera[2].z * -f_Power));
+	bulletActor->setFriction(glm::vec3(0.5f));
 
 	Osiris::Sphere *sphere = new Osiris::Sphere();
 	sphere->setColour(glm::vec4(rand()%100 / 100.0f,rand()%100 / 100.0f,rand()%100 / 100.0f,1));
@@ -38,6 +39,7 @@ void AddBox(const glm::mat4& m4_Camera,float f_Power){
 	Osiris::ActorDynamic *bulletActor = new Osiris::ActorDynamic();
 	bulletActor->setTranslate(m4_Camera[3].xyz);
 	bulletActor->setVelocity(glm::vec3(m4_Camera[2].x * -f_Power,m4_Camera[2].y * -f_Power,m4_Camera[2].z * -f_Power));
+	bulletActor->setFriction(glm::vec3(0.1f));
 
 	Osiris::AxisBox *box = new Osiris::AxisBox();
 	box->setColour(glm::vec4(rand()%100 / 100.0f,rand()%100 / 100.0f,rand()%100 / 100.0f,1));
@@ -63,6 +65,7 @@ bool _03_LinearForceMomentum::onCreate(int a_argc, char* a_argv[]) {
 
 	Osiris::ActorStatic *planeStatic = new Osiris::ActorStatic();
 	Osiris::Plane *plane = new Osiris::Plane();
+	plane->setFriction(glm::vec3(0.1f));
 	plane->setUp(glm::vec3(0,1,0));
 	plane->setColour(glm::vec4(0,0,1,0.1f));
 	planeStatic->addShape(plane);

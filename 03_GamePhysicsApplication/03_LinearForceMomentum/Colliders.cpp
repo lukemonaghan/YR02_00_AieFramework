@@ -4,7 +4,7 @@
 #include "Scene.hpp"
 
 namespace Osiris{
-
+	ShapeType a1,a2;
 	//!--COLLISIONS
 
 	bool Shape_Shape(Shape *s_Shape1,Shape *s_Shape2,glm::vec3 &v3_CollisionPoint){
@@ -64,24 +64,42 @@ namespace Osiris{
 
 	void Actor_Actor(Actor *a_Actor1,Actor *a_Actor2,glm::vec3 v3_CollisionPoint){
 		if (a_Actor1->getType() == ActorType::DYNAMIC){
+			printf("%s %s \n",SHAPETYPE(a1),SHAPETYPE(a2));
 			if ( v3_CollisionPoint == glm::vec3(0.0f) ) { v3_CollisionPoint = glm::vec3(glm::epsilon<float>()); }
-			//glm::vec3 vel = -((ActorDynamic*)a_Actor1)->getVelocity();
+			glm::vec3 vel = ((ActorDynamic*)a_Actor1)->getVelocity();
 			glm::vec3 pos = ((ActorDynamic*)a_Actor1)->getModel()[3].xyz;
-			pos = v3_CollisionPoint - pos;
-			//pos *= -((ActorDynamic*)a_Actor1)->getVelocity();
-			((ActorDynamic*)a_Actor1)->setVelocity(pos);// * (1.0f - ((ActorDynamic*)a_Actor1)->getFriction()));
+			((ActorDynamic*)a_Actor1)->setTranslate(pos + v3_CollisionPoint);
+
+			pos.x = (v3_CollisionPoint.x == 0.0f) ? vel.x : -vel.x;
+			pos.y = (v3_CollisionPoint.y == 0.0f) ? vel.y : -vel.y;
+			pos.z = (v3_CollisionPoint.z == 0.0f) ? vel.z : -vel.z;
+
+			glm::vec3 friction = 1.0f - (((ActorDynamic*)a_Actor1)->getFriction() + ((ActorDynamic*)a_Actor2)->getFriction());
+			pos *= friction;
+			((ActorDynamic*)a_Actor1)->setVelocity(pos);
+			printf("v %f %f %f \n",pos.x,pos.y,pos.z);
 		}
 		if (a_Actor2->getType() == ActorType::DYNAMIC){
+			printf("%s %s \n",SHAPETYPE(a1),SHAPETYPE(a2));
 			if ( v3_CollisionPoint == glm::vec3(0.0f) ) { v3_CollisionPoint = -glm::vec3(glm::epsilon<float>()); }
-			//glm::vec3 vel = -((ActorDynamic*)a_Actor2)->getVelocity();
+			glm::vec3 vel = ((ActorDynamic*)a_Actor2)->getVelocity();
 			glm::vec3 pos = ((ActorDynamic*)a_Actor2)->getModel()[3].xyz;
-			pos = v3_CollisionPoint - pos;
-			//pos *= -((ActorDynamic*)a_Actor1)->getVelocity();
-			((ActorDynamic*)a_Actor2)->setVelocity(pos);// * (1.0f - ((ActorDynamic*)a_Actor2)->getFriction()));	
+			((ActorDynamic*)a_Actor2)->setTranslate(pos + v3_CollisionPoint);
+
+			pos.x = (v3_CollisionPoint.x == 0.0f) ? vel.x : -vel.x;
+			pos.y = (v3_CollisionPoint.y == 0.0f) ? vel.y : -vel.y;
+			pos.z = (v3_CollisionPoint.z == 0.0f) ? vel.z : -vel.z;
+
+			glm::vec3 friction = 1.0f - (((ActorDynamic*)a_Actor2)->getFriction() + ((ActorDynamic*)a_Actor1)->getFriction());
+			pos *= friction;
+			((ActorDynamic*)a_Actor2)->setVelocity(pos);
+			printf("v %f %f %f \n",pos.x,pos.y,pos.z);
 		}
 	}
 
 	bool Sphere_Sphere	(Sphere *s_Shape1	, Sphere	*s_Shape2	, glm::vec3 &v3_CollisionPoint){
+		a1 = s_Shape1->getType();
+		a2 = s_Shape2->getType();
 		float combinedRad = s_Shape1->getRadius() + s_Shape2->getRadius();
 		if ((combinedRad > s_Shape1->getTranslate().x - s_Shape2->getTranslate().x) && 
 			(combinedRad > s_Shape1->getTranslate().y - s_Shape2->getTranslate().y) && 
@@ -94,6 +112,8 @@ namespace Osiris{
 		return false;
 	}
 	bool Sphere_AABB	(Sphere *s_Shape1	, AxisBox	*s_Shape2	, glm::vec3 &v3_CollisionPoint){
+		a1 = s_Shape1->getType();
+		a2 = s_Shape2->getType();
 		glm::vec3 dist = s_Shape1->getModel()[3].xyz - s_Shape2->getModel()[3].xyz;
 		glm::vec3 boxPoint(0);
 		
@@ -132,12 +152,14 @@ namespace Osiris{
 		return false;
 	}
 	bool Sphere_Plane	(Sphere *s_Shape1	, Plane		*s_Shape2	, glm::vec3 &v3_CollisionPoint){
+		a1 = s_Shape1->getType();
+		a2 = s_Shape2->getType();
 		float dist = glm::dot<float>(s_Shape2->getModel()[3].xyz - s_Shape2->getUp(),s_Shape1->getModel()[3].xyz ) - s_Shape2->getModel()[3].w;
 
 		glm::vec3 s1Pos = s_Shape1->getModel()[3].xyz;
-		v3_CollisionPoint.x = (s_Shape2->getUp().x != 0.0f) ? s1Pos.x + s_Shape1->getRadius() : s1Pos.x ;
-		v3_CollisionPoint.y = (s_Shape2->getUp().y != 0.0f) ? s1Pos.y + s_Shape1->getRadius() : s1Pos.y ;
-		v3_CollisionPoint.z = (s_Shape2->getUp().z != 0.0f) ? s1Pos.z + s_Shape1->getRadius() : s1Pos.z ;
+		v3_CollisionPoint.x = (s_Shape2->getUp().x != 0.0f) ? s1Pos.x + s_Shape1->getRadius() : 0.0f ;
+		v3_CollisionPoint.y = (s_Shape2->getUp().y != 0.0f) ? s1Pos.y + s_Shape1->getRadius() : 0.0f ;
+		v3_CollisionPoint.z = (s_Shape2->getUp().z != 0.0f) ? s1Pos.z + s_Shape1->getRadius() : 0.0f ;
 
 		if (dist < -s_Shape1->getRadius()){
 			//behind
@@ -161,6 +183,8 @@ namespace Osiris{
 
 	bool AABB_Sphere	(AxisBox *s_Shape1	, Sphere	*s_Shape2	, glm::vec3 &v3_CollisionPoint){return Sphere_AABB(s_Shape2,s_Shape1,v3_CollisionPoint);}
 	bool AABB_AABB		(AxisBox *s_Shape1	, AxisBox	*s_Shape2	, glm::vec3 &v3_CollisionPoint){
+		a1 = s_Shape1->getType();
+		a2 = s_Shape2->getType();
 		v3_CollisionPoint = glm::vec3(0);
 
 		glm::vec3 s1Pos = s_Shape1->getModel()[3].xyz;
@@ -191,14 +215,17 @@ namespace Osiris{
 		return false;
 	}
 	bool AABB_Plane		(AxisBox *s_Shape1	, Plane		*s_Shape2	, glm::vec3 &v3_CollisionPoint){
-
+		
+		a1 = s_Shape1->getType();
+		a2 = s_Shape2->getType();
+		
 		glm::vec3 s1Pos = s_Shape1->getModel()[3].xyz;
 		glm::vec3 s1Extents = s_Shape1->getExtents() + glm::vec3(0.1f); //@MAGIC fix
 
 		//v3_CollisionPoint = s_Shape2->getModel()[3].xyz;
-		v3_CollisionPoint.x = (s_Shape2->getUp().x != 0.0f) ? s1Pos.x + (s1Extents.x * s_Shape2->getUp().x ) : s1Pos.x ;
-		v3_CollisionPoint.y = (s_Shape2->getUp().y != 0.0f) ? s1Pos.y + (s1Extents.y * s_Shape2->getUp().y ) : s1Pos.y ;
-		v3_CollisionPoint.z = (s_Shape2->getUp().z != 0.0f) ? s1Pos.z + (s1Extents.z * s_Shape2->getUp().z ) : s1Pos.z ;
+		v3_CollisionPoint.x = (s_Shape2->getUp().x != 0.0f) ? s1Pos.x + (s1Extents.x * s_Shape2->getUp().x ) : 0.0f ;
+		v3_CollisionPoint.y = (s_Shape2->getUp().y != 0.0f) ? s1Pos.y + (s1Extents.y * s_Shape2->getUp().y ) : 0.0f ;
+		v3_CollisionPoint.z = (s_Shape2->getUp().z != 0.0f) ? s1Pos.z + (s1Extents.z * s_Shape2->getUp().z ) : 0.0f ;
 
 		if (s_Shape2->getUp().x != 0.0f){
 			if (s_Shape2->getUp().x < 0.0f){

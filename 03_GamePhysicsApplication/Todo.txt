@@ -1,0 +1,44 @@
+
+Blog
+X	A description of the day's work 
+	Code samples 
+X	Screen shots of completed work 
+	Links to standalone executables or installers for download 
+
+Production Plan
+	Effects to be demonstrated 
+	How they will be implemented 
+	How the chosen effects enhance the scene 
+	A timeline for completion 
+	Name and brief description of at least one commercially successful game which makes good use of these effects 
+
+PhysX
+	PhysX API integration 
+	PhysX Scene instantiated and set up correctly 
+	At least 1 example each of a static body and a rigid body with a simple collision volume in the scene 
+	At least 1 example of a ragdoll in the scene 
+	At least 1 example of player controlled model in the scene 
+	At least 1 example of a trigger volume in the scene 
+	At least 1 example of a collision event with call back in the scene 
+	Frame rate should be constrained to a desired rate 
+	Example of the game connecting to the Nvidia Physics Visual Debugger 
+	At least one example of a physical particle effect 
+	At least one example of a fluid in the scene 
+	At least one soft body such as cloth
+
+Documentation
+	Build Class diagrams for all objects 
+	Describe techniques used to create interactivity 
+	Describe the objects and where they were used 
+	Document the libraries used 
+	Document your experiences of using the debugger, including screen shots, 
+	performance measures and any positive or negative experiences you had with it 
+
+DIY Physics
+X	Creating a scene 
+	At least two objects added to the scene which react according to Newton's 3 laws of motion 
+X	Demonstrate a force acting on an object 
+	Demonstrate one object applying a force to another 
+X	Demonstrating collision detection between objects 
+	Demonstrate collision response for objects 
+	Demonstrating spring physics between connected objects 
