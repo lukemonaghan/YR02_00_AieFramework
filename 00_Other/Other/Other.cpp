@@ -4,9 +4,12 @@
 #include <GLFW/glfw3.h>
 #include <glm/ext.hpp>
 #include "VertexBatch.hpp"
+#include <Gizmos.h>
 
 #define DEFAULT_SCREENWIDTH 1280
 #define DEFAULT_SCREENHEIGHT 720
+
+#define CUBE_COUNT 100
 
 Other::Other(){}
 Other::~Other(){}
@@ -19,11 +22,18 @@ bool Other::onCreate(int a_argc, char* a_argv[]) {
 	glClearColor(0.25f,0.25f,0.25f,1);
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
+
+	sScene = new Shader("shaders/Gizmo/Gizmo.vert","shaders/Gizmo/Gizmo.frag",0,0,"shaders/Gizmo/Gizmo.geom");
+	sScene->SetAttribs(4,0,"Position",1,"Information",2,"Colour",3,"Bitset");
 	
 	//!--TUTORIAL
 	vb = new Osiris::VertexBatch();
-	vb->Add(&Osiris::Gizmo::BoxSingleFace(glm::vec3(0),glm::vec3(1),glm::vec4(1,0,0,1)));
-	vb->Add(&Osiris::Gizmo::Plane(glm::vec3(0),glm::vec2(100),glm::vec4(1,1,1,1)));
+	vb->SetShader(sScene->id);
+	for (int i = 0; i < CUBE_COUNT; i++) {
+		vb->Add(new Osiris::Gizmo::Box(glm::vec3(rand()%100 - 50,0,rand()%100 - 50),glm::vec3(1),glm::vec4(1,0,0,1) + glm::vec4(rand()%10 / 10.0f)));
+	}
+	vb->Add(new Osiris::Gizmo::Plane(glm::vec3(0),glm::vec3(5),glm::vec4(0,1,0,1)));
+	vb->Add(new Osiris::Gizmo::Point(glm::vec3(3),glm::vec4(0,0,1,1)));
 	vb->Update();
 	//!--TUTORIAL
 	return true;
@@ -31,28 +41,61 @@ bool Other::onCreate(int a_argc, char* a_argv[]) {
 
 void Other::onUpdate(float a_deltaTime) {
 	Utility::freeMovement( m_cameraMatrix, a_deltaTime, 10 );
+
 	//!--TUTORIAL
+	static bool bf1 = false;
+	if (glfwGetKey(m_window,GLFW_KEY_F1) == GLFW_PRESS) {
+		if (!bf1){
+			bf1 = true;
+			printf("%i elements\n",vb->getCount());
+			printf("%f\n",1/Utility::getDeltaTime());
+		}
+	}else{
+		if (bf1){
+			bf1 = false;
+		}
+	}
+
+	if (glfwGetKey(m_window,GLFW_KEY_F2) == GLFW_PRESS) {
+		if (1/Utility::getDeltaTime() > 120.0f) {
+			for (int i = 0; i < CUBE_COUNT; i++) {
+				vb->Add(new Osiris::Gizmo::Box(glm::vec3(rand()%100 - 50,rand()%100,rand()%100 - 50),glm::vec3(1),glm::vec4(1,0,0,1) + glm::vec4(rand()%10 / 10.0f)));
+			}
+		}
+		vb->Update();
+	}
+	
+	if (glfwGetKey(m_window,GLFW_KEY_F3) == GLFW_PRESS) {
+		const Osiris::GizmoMap *map = vb->getMap();
+
+		for (auto giz : *map){
+			giz.second->move();
+		}
+
+		vb->Update();
+	}
 
 	//!--TUTORIAL
 	
 	if (glfwGetKey(m_window,GLFW_KEY_ESCAPE) == GLFW_PRESS) {
 		quit();
 	}
+
 }
 
 void Other::onDraw() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glm::mat4 viewMatrix = glm::inverse( m_cameraMatrix );
-	
 	//!--TUTORIAL
-	vb->Draw(viewMatrix,m_projectionMatrix);
-	//!--TUTORIAL
-	
+	sScene->SetUniform("ViewProjection","m4fv",1,false,glm::value_ptr(m_projectionMatrix * viewMatrix));
+	vb->Draw();
+	//!--TUTORIAL	
 }
 
 void Other::onDestroy() {
-	//!--TUTORIAL
 
+	//!--TUTORIAL
+	delete vb;
 	//!--TUTORIAL
 }
 

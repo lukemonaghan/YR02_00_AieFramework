@@ -3,6 +3,7 @@
 
 #include "Application.h"
 #include <glm/glm.hpp>
+#include <Shader.h>
 
 // Derived application class that wraps up all globals neatly
 class Other : public Application
@@ -23,6 +24,8 @@ protected:
 	glm::mat4	m_projectionMatrix;
 	
 	//!--TUTORIAL
+
+	Shader *sScene;
 
 	//!--TUTORIAL
 };

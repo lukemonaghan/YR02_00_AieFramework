@@ -39,7 +39,7 @@ void AddBox(const glm::mat4& m4_Camera,float f_Power){
 	Osiris::ActorDynamic *bulletActor = new Osiris::ActorDynamic();
 	bulletActor->setTranslate(m4_Camera[3].xyz);
 	bulletActor->setVelocity(glm::vec3(m4_Camera[2].x * -f_Power,m4_Camera[2].y * -f_Power,m4_Camera[2].z * -f_Power));
-	bulletActor->setFriction(glm::vec3(0.1f));
+	bulletActor->setFriction(glm::vec3(0.5f));
 
 	Osiris::AxisBox *box = new Osiris::AxisBox();
 	box->setColour(glm::vec4(rand()%100 / 100.0f,rand()%100 / 100.0f,rand()%100 / 100.0f,1));

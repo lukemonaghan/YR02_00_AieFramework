@@ -67,7 +67,7 @@ namespace Osiris{
 			printf("%s %s \n",SHAPETYPE(a1),SHAPETYPE(a2));
 			if ( v3_CollisionPoint == glm::vec3(0.0f) ) { v3_CollisionPoint = glm::vec3(glm::epsilon<float>()); }
 			glm::vec3 vel = ((ActorDynamic*)a_Actor1)->getVelocity();
-			glm::vec3 pos = ((ActorDynamic*)a_Actor1)->getModel()[3].xyz;
+			glm::vec3 pos(0);
 			((ActorDynamic*)a_Actor1)->setTranslate(pos + v3_CollisionPoint);
 
 			pos.x = (v3_CollisionPoint.x == 0.0f) ? vel.x : -vel.x;
@@ -80,10 +80,10 @@ namespace Osiris{
 			printf("v %f %f %f \n",pos.x,pos.y,pos.z);
 		}
 		if (a_Actor2->getType() == ActorType::DYNAMIC){
-			printf("%s %s \n",SHAPETYPE(a1),SHAPETYPE(a2));
+			printf("%s %s \n",SHAPETYPE(a2),SHAPETYPE(a1));
 			if ( v3_CollisionPoint == glm::vec3(0.0f) ) { v3_CollisionPoint = -glm::vec3(glm::epsilon<float>()); }
 			glm::vec3 vel = ((ActorDynamic*)a_Actor2)->getVelocity();
-			glm::vec3 pos = ((ActorDynamic*)a_Actor2)->getModel()[3].xyz;
+			glm::vec3 pos(0);
 			((ActorDynamic*)a_Actor2)->setTranslate(pos + v3_CollisionPoint);
 
 			pos.x = (v3_CollisionPoint.x == 0.0f) ? vel.x : -vel.x;
@@ -157,9 +157,10 @@ namespace Osiris{
 		float dist = glm::dot<float>(s_Shape2->getModel()[3].xyz - s_Shape2->getUp(),s_Shape1->getModel()[3].xyz ) - s_Shape2->getModel()[3].w;
 
 		glm::vec3 s1Pos = s_Shape1->getModel()[3].xyz;
-		v3_CollisionPoint.x = (s_Shape2->getUp().x != 0.0f) ? s1Pos.x + s_Shape1->getRadius() : 0.0f ;
-		v3_CollisionPoint.y = (s_Shape2->getUp().y != 0.0f) ? s1Pos.y + s_Shape1->getRadius() : 0.0f ;
-		v3_CollisionPoint.z = (s_Shape2->getUp().z != 0.0f) ? s1Pos.z + s_Shape1->getRadius() : 0.0f ;
+		glm::vec3 s2Pos = s_Shape2->getModel()[3].xyz;
+		v3_CollisionPoint.x = (s_Shape2->getUp().x != 0.0f) ? s2Pos.x + (s_Shape1->getRadius() * 0.5f) : 0.0f ;
+		v3_CollisionPoint.y = (s_Shape2->getUp().y != 0.0f) ? s2Pos.y + (s_Shape1->getRadius() * 0.5f) : 0.0f ;
+		v3_CollisionPoint.z = (s_Shape2->getUp().z != 0.0f) ? s2Pos.z + (s_Shape1->getRadius() * 0.5f) : 0.0f ;
 
 		if (dist < -s_Shape1->getRadius()){
 			//behind
@@ -225,9 +226,9 @@ namespace Osiris{
 		glm::vec3 s1Extents = s_Shape1->getExtents();
 
 		//v3_CollisionPoint = s_Shape2->getModel()[3].xyz;
-		v3_CollisionPoint.x = (s_Shape2->getUp().x != 0.0f) ? s1Pos.x + (s1Extents.x * s_Shape2->getUp().x ) : 0.0f;
-		v3_CollisionPoint.y = (s_Shape2->getUp().y != 0.0f) ? s1Pos.y + (s1Extents.y * s_Shape2->getUp().y ) : 0.0f;
-		v3_CollisionPoint.z = (s_Shape2->getUp().z != 0.0f) ? s1Pos.z + (s1Extents.z * s_Shape2->getUp().z ) : 0.0f;
+		v3_CollisionPoint.x = (s_Shape2->getUp().x != 0.0f) ? s2Pos.x + (s1Extents.x * 0.5f * s_Shape2->getUp().x ) : 0.0f;
+		v3_CollisionPoint.y = (s_Shape2->getUp().y != 0.0f) ? s2Pos.y + (s1Extents.y * 0.5f * s_Shape2->getUp().y ) : 0.0f;
+		v3_CollisionPoint.z = (s_Shape2->getUp().z != 0.0f) ? s2Pos.z + (s1Extents.z * 0.5f * s_Shape2->getUp().z ) : 0.0f;
 
 		if (s_Shape2->getUp().x != 0.0f){
 			if (s_Shape2->getUp().x < 0.0f){
