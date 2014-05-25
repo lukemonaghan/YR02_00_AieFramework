@@ -154,16 +154,17 @@ namespace Osiris{
 
 	protected:
 		unsigned int	_VAO,
-						_VBO;
-
-		unsigned int	_VertexCount,
+						_VBO,
+						_VertexCount,
 						_sGizmoShader;
 
 		unsigned int	 _NextObjectID;
-		GizmoMap _GizmoObjects;   
+		GizmoMap		_GizmoObjects;   
 	};
 
 	namespace Gizmo{
+
+		enum FACING{ Out = 0, In = 1 };
 
 		int setBits(short s_ID, short s_SmoothNormals, short s_Facing){
 			return (s_ID + (s_SmoothNormals << 9) + (s_Facing << 10));
@@ -171,30 +172,70 @@ namespace Osiris{
 
 		class Point : public GizmoObject{
 		public:
-			Point(glm::vec3 Location,glm::vec4 Colour){
+			Point(glm::vec3 Location,glm::vec4 Colour,bool smooth = false, FACING facing = FACING::Out ){
 				Vertex.Position = glm::vec3(Location); 
 				Vertex.Information = glm::vec3(0); 
-				Vertex.Bitset = setBits(0,1,0);
+				Vertex.Bitset = setBits(0,(int)smooth,(int)facing);
 				Vertex.Colour = Colour;
 			}
 		};
 
 		class Box : public GizmoObject{
 		public:
-			Box(glm::vec3 Location,glm::vec3 Extents, glm::vec4 Colour){
+			Box(glm::vec3 Location,glm::vec3 Extents, glm::vec4 Colour,bool smooth = false, FACING facing = FACING::Out ){
 				Vertex.Position = glm::vec3(Location); 
 				Vertex.Information = Extents; 
-				Vertex.Bitset = setBits(1,1,0);
+				Vertex.Bitset = setBits(1,(int)smooth,(int)facing);
 				Vertex.Colour = Colour;
 			}
 		};
 
 		class Plane : public GizmoObject{
 		public:
-			Plane(glm::vec3 Location,glm::vec3 Extents, glm::vec4 Colour){
+			Plane(glm::vec3 Location,glm::vec3 Extents, glm::vec4 Colour,bool smooth = false, FACING facing = FACING::Out ){
 				Vertex.Position = glm::vec3(Location); 
 				Vertex.Information = Extents; 
-				Vertex.Bitset = setBits(2,1,0);
+				Vertex.Bitset = setBits(2,(int)smooth,(int)facing);
+				Vertex.Colour = Colour;
+			}
+		};
+				
+		class Sphere : public GizmoObject{
+		public:
+			Sphere(glm::vec3 Location,float radius, float rows, float columns, glm::vec4 Colour,bool smooth = false, FACING facing = FACING::Out ){
+				Vertex.Position = glm::vec3(Location); 
+				Vertex.Information = glm::vec3(radius,rows,columns); 
+				Vertex.Bitset = setBits(3,(int)smooth,(int)facing);
+				Vertex.Colour = Colour;
+			}
+		};
+				
+		class Cylinder : public GizmoObject{
+		public:
+			Cylinder(glm::vec3 Location,float radius, float halfWidth,float segments, glm::vec4 Colour,bool smooth = false, FACING facing = FACING::Out ){
+				Vertex.Position = glm::vec3(Location); 
+				Vertex.Information = glm::vec3(radius,halfWidth,segments); 
+				Vertex.Bitset = setBits(4,(int)smooth,(int)facing);
+				Vertex.Colour = Colour;
+			}
+		};
+				
+		class Ring : public GizmoObject{
+		public:
+			Ring(glm::vec3 Location,float innerRadius, float outerRadius,float segments, glm::vec4 Colour,bool smooth = false, FACING facing = FACING::Out ){
+				Vertex.Position = glm::vec3(Location); 
+				Vertex.Information = glm::vec3(innerRadius,outerRadius,segments); 
+				Vertex.Bitset = setBits(5,(int)smooth,(int)facing);
+				Vertex.Colour = Colour;
+			}
+		};
+
+		class Disk : public GizmoObject{
+		public:
+			Disk(glm::vec3 Location, float radius,float segments, glm::vec4 Colour, bool smooth = false, FACING facing = FACING::Out ){
+				Vertex.Position = glm::vec3(Location); 
+				Vertex.Information = glm::vec3(radius,segments,0.0f); 
+				Vertex.Bitset = setBits(5,(int)smooth,(int)facing);
 				Vertex.Colour = Colour;
 			}
 		};
