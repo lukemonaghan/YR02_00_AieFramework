@@ -5,7 +5,9 @@ in vec3 Position;
 in vec3 Information;
 in vec4 Colour;
 in int  Bitset;
+in mat4 Model;
 
+out mat4 vModel;
 out vec3 vPosition;
 out vec3 vInformation;
 out vec4 vColour;
@@ -18,6 +20,7 @@ const int SMOOTHMASK = 256;
 const int FACINGMASK = 1024;
 
 void main(){
+	vModel = Model;
 	vPosition = Position;
 	vInformation = Information;
 	vColour = Colour;

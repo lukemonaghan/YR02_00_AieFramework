@@ -16,6 +16,9 @@ Other::~Other(){}
 
 Osiris::VertexBatch *vb;
 
+#define MAXDIMENS 100
+unsigned int xNext = 0,yNext = 0,zNext = 0;
+
 bool Other::onCreate(int a_argc, char* a_argv[]) {
 	m_cameraMatrix = glm::inverse( glm::lookAt(glm::vec3(10,10,10),glm::vec3(0,0,0), glm::vec3(0,1,0)) );
 	m_projectionMatrix = glm::perspective(glm::pi<float>() * 0.25f, DEFAULT_SCREENWIDTH/(float)DEFAULT_SCREENHEIGHT, 0.1f, 1000.0f);
@@ -24,21 +27,17 @@ bool Other::onCreate(int a_argc, char* a_argv[]) {
 	glEnable(GL_CULL_FACE);
 
 	sScene = new Shader("shaders/Gizmo/Gizmo.vert","shaders/Gizmo/Gizmo.frag",0,0,"shaders/Gizmo/Gizmo.geom");
-	sScene->SetAttribs(4,0,"Position",1,"Information",2,"Colour",3,"Bitset");
+	sScene->SetAttribs(5,0,"Position",1,"Information",2,"Colour",3,"Bitset",4,"Model");
 	
 	//!--TUTORIAL
 	vb = new Osiris::VertexBatch();
 	vb->SetShader(sScene->id);
-	for (int i = 0; i < CUBE_COUNT; i++) {
-		vb->Add(new Osiris::Gizmo::Box(glm::vec3(rand()%100 - 50,0,rand()%100 - 50),glm::vec3(1),glm::vec4(1,0,0,1) + glm::vec4(rand()%10 / 10.0f)));
-	}
-	vb->Add(new Osiris::Gizmo::Plane(glm::vec3(0),glm::vec3(5),glm::vec4(0,1,0,1)));
-	vb->Add(new Osiris::Gizmo::Point(glm::vec3(3),glm::vec4(0,0,1,1)));
-	vb->Update();
+	xNext = zNext = yNext = 0;
 	//!--TUTORIAL
 	return true;
 }
 
+int type = 0;
 void Other::onUpdate(float a_deltaTime) {
 	Utility::freeMovement( m_cameraMatrix, a_deltaTime, 10 );
 
@@ -56,33 +55,70 @@ void Other::onUpdate(float a_deltaTime) {
 		}
 	}
 
-	if (glfwGetKey(m_window,GLFW_KEY_F2) == GLFW_PRESS) {
-		if (1/Utility::getDeltaTime() > 120.0f) {
-			for (int i = 0; i < CUBE_COUNT; i++) {
-				vb->Add(new Osiris::Gizmo::Box(glm::vec3(rand()%100 - 50,rand()%100,rand()%100 - 50),glm::vec3(1),glm::vec4(1,0,0,1) + glm::vec4(rand()%10 / 10.0f)));
-			}
+	int count = vb->getCount();
+	#define MAX_LOOP 1000
+	while (glfwGetKey(m_window,GLFW_KEY_F2) == GLFW_PRESS) {
+		if (zNext > MAXDIMENS){zNext = 0;yNext++;}
+		if (xNext > MAXDIMENS){xNext = 0;zNext++;}else{xNext++;}
+		switch (type){
+		case 0:
+			vb->Add(new Osiris::Gizmo::Point(glm::vec3(xNext,yNext,zNext),glm::vec4(0,0,0,1) + glm::vec4(rand()%10 / 10.0f)));
+			break;
+		case 1:
+			vb->Add(new Osiris::Gizmo::Box(glm::vec3(xNext,yNext,zNext),glm::vec3(0.5f),glm::vec4(0,0,0,1) + glm::vec4(rand()%10 / 10.0f)));
+			break;
+		case 2:
+			vb->Add(new Osiris::Gizmo::Plane(glm::vec3(xNext,yNext,zNext),glm::vec3(0.5f),glm::vec4(0,0,0,1) + glm::vec4(rand()%10 / 10.0f)));
+			break;
+		case 3:
+			vb->Add(new Osiris::Gizmo::Sphere(glm::vec3(xNext,yNext,zNext),0.5f,8,8,glm::vec4(0,0,0,1) + glm::vec4(rand()%10 / 10.0f)));
+			break;
+		case 4:
+			vb->Add(new Osiris::Gizmo::Cylinder(glm::vec3(xNext,yNext,zNext),0.5f,1,8,glm::vec4(0,0,0,1) + glm::vec4(rand()%10 / 10.0f)));
+			break;
+		case 5:
+			vb->Add(new Osiris::Gizmo::Ring(glm::vec3(xNext,yNext,zNext),0.5f,1.0f,8,glm::vec4(0,0,0,1) + glm::vec4(rand()%10 / 10.0f)));
+			break;
+		case 6:
+			vb->Add(new Osiris::Gizmo::Disk(glm::vec3(xNext,yNext,zNext),0.5f,16,glm::vec4(0,0,0,1) + glm::vec4(rand()%10 / 10.0f)));
+			break;
 		}
-		vb->Update();
+		if (vb->getCount() > count + MAX_LOOP){vb->Update();break;}
 	}
-	
+
 	if (glfwGetKey(m_window,GLFW_KEY_F3) == GLFW_PRESS) {
 		const Osiris::GizmoMap *map = vb->getMap();
-
-		for (auto giz : *map){
-			giz.second->move();
-		}
-
+		size_t key = rand()%(*map).size();
+		(*map).at(key)->move();
 		vb->Update();
+	}
+
+	static bool bF4 = false;
+	if (glfwGetKey(m_window,GLFW_KEY_F4) == GLFW_PRESS) {
+		if (!bF4){
+			bF4 = true;
+			if (type >= TYPE_COUNT){type = 0;}else{type++;}
+			printf("%s \n",GETYPE(type));
+		}
+	}else{
+		bF4 = false;
+	}
+
+	if (glfwGetKey(m_window,GLFW_KEY_F12) == GLFW_PRESS) {
+		sScene->ReloadShader();
+		sScene->SetAttribs(5,0,"Position",1,"Information",2,"Colour",3,"Bitset",4,"Model");
 	}
 
 	//!--TUTORIAL
+
+
 	
 	if (glfwGetKey(m_window,GLFW_KEY_ESCAPE) == GLFW_PRESS) {
 		quit();
 	}
 
 }
-
+	
 void Other::onDraw() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glm::mat4 viewMatrix = glm::inverse( m_cameraMatrix );
