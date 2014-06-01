@@ -71,7 +71,7 @@ void Other::onUpdate(float a_deltaTime) {
 			vb->Add(new Osiris::Gizmo::Plane(glm::vec3(xNext,yNext,zNext),glm::vec3(0.5f),glm::vec4(0,0,0,1) + glm::vec4(rand()%10 / 10.0f)));
 			break;
 		case 3:
-			vb->Add(new Osiris::Gizmo::Sphere(glm::vec3(xNext,yNext,zNext),0.5f,8,8,glm::vec4(0,0,0,1) + glm::vec4(rand()%10 / 10.0f)));
+			vb->Add(new Osiris::Gizmo::Sphere(glm::vec3(xNext,yNext,zNext),0.5f,3,3,glm::vec4(0,0,0,1) + glm::vec4(rand()%10 / 10.0f)));
 			break;
 		case 4:
 			vb->Add(new Osiris::Gizmo::Cylinder(glm::vec3(xNext,yNext,zNext),0.5f,1,8,glm::vec4(0,0,0,1) + glm::vec4(rand()%10 / 10.0f)));
@@ -81,6 +81,9 @@ void Other::onUpdate(float a_deltaTime) {
 			break;
 		case 6:
 			vb->Add(new Osiris::Gizmo::Disk(glm::vec3(xNext,yNext,zNext),0.5f,16,glm::vec4(0,0,0,1) + glm::vec4(rand()%10 / 10.0f)));
+			break;		
+		case 7:
+			vb->Add(new Osiris::Gizmo::Cone(glm::vec3(xNext,yNext,zNext),0.5f,glm::vec4(0,0,0,1) + glm::vec4(rand()%10 / 10.0f)));
 			break;
 		}
 		if (vb->getCount() > count + MAX_LOOP){vb->Update();break;}
@@ -88,9 +91,11 @@ void Other::onUpdate(float a_deltaTime) {
 
 	if (glfwGetKey(m_window,GLFW_KEY_F3) == GLFW_PRESS) {
 		const Osiris::GizmoMap *map = vb->getMap();
-		size_t key = rand()%(*map).size();
-		(*map).at(key)->move();
-		vb->Update();
+		if ((*map).size() != 0){
+			size_t key = rand()%(*map).size();
+			(*map).at(key)->move();
+			vb->Update();
+		}
 	}
 
 	static bool bF4 = false;
@@ -104,15 +109,12 @@ void Other::onUpdate(float a_deltaTime) {
 		bF4 = false;
 	}
 
-	if (glfwGetKey(m_window,GLFW_KEY_F12) == GLFW_PRESS) {
+	if (glfwGetKey(m_window,GLFW_KEY_F11) == GLFW_PRESS) {
 		sScene->ReloadShader();
 		sScene->SetAttribs(5,0,"Position",1,"Information",2,"Colour",3,"Bitset",4,"Model");
 	}
 
 	//!--TUTORIAL
-
-
-	
 	if (glfwGetKey(m_window,GLFW_KEY_ESCAPE) == GLFW_PRESS) {
 		quit();
 	}

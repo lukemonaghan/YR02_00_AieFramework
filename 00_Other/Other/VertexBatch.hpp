@@ -177,8 +177,8 @@ namespace Osiris{
 
 	namespace Gizmo{
 
-		#define GETYPE(type) ((type == 0) ? "Point" : (type == 1) ? "Box" : (type == 2) ? "Plane" : (type == 3) ? "Sphere" : (type == 4) ? "Cylinder" : (type == 5) ? "Ring" : "Disk")
-		#define TYPE_COUNT 6
+		#define GETYPE(type) ((type == 0) ? "Point" : (type == 1) ? "Box" : (type == 2) ? "Plane" : (type == 3) ? "Sphere" : (type == 4) ? "Cylinder" : (type == 5) ? "Ring" : (type == 6) ? "Disk" : "Cone")
+		#define TYPE_COUNT 7
 
 		enum FACING{ Out = 0, In = 1 };
 
@@ -259,6 +259,17 @@ namespace Osiris{
 				Vertex.Position = glm::vec3(Location); 
 				Vertex.Information = glm::vec3(radius,segments,0.0f); 
 				Vertex.Bitset = setBits(6,(int)smooth,(int)facing);
+				Vertex.Colour = Colour;
+			}
+		};
+
+		class Cone : public GizmoObject{
+		public:
+			Cone(glm::vec3 Location, float radius, glm::vec4 Colour, bool smooth = false, FACING facing = FACING::Out ){
+				Vertex.Model = glm::mat4(1);
+				Vertex.Position = glm::vec3(Location); 
+				Vertex.Information = glm::vec3(radius,0.0f,0.0f); 
+				Vertex.Bitset = setBits(7,(int)smooth,(int)facing);
 				Vertex.Colour = Colour;
 			}
 		};

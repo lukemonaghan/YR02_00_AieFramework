@@ -3,6 +3,9 @@
 
 layout (points) in;
 layout (triangle_strip,max_vertices = 1024) out;
+// MaxVerts for a 660ti is 1024
+// Dividing this by our two vec4's (gl_Position and gColour)
+// we are left with 128 outputs
 
 in mat4 vModel[];
 in vec3 vPosition[];
@@ -12,19 +15,9 @@ in int  vID[];
 in int  vSmooth[];
 in int  vFacing[];
 
-out vec4 gColour;
+//out vec4 gColour;
 
 uniform mat4 ViewProjection;
-
-void addTri(vec4 Pos1, vec4 Pos2, vec4 Pos3){
-	gl_Position = ViewProjection * Pos1;
-	EmitVertex();
-	gl_Position = ViewProjection * Pos2;
-	EmitVertex();
-	gl_Position = ViewProjection * Pos3;
-	EmitVertex();
-	EndPrimitive();
-}
 
 // BOX CONSTANTS
 const vec4 BOXvertices[8] = vec4[8](
@@ -39,11 +32,10 @@ const vec4 BOXvertices[8] = vec4[8](
 	);
 const int BOXindices[24] = int[24](0, 1, 2, 3, 1, 5, 3, 7, 5, 4, 7, 6, 4, 0, 6, 2, 2, 3, 6, 7, 4, 5, 0, 1);
 const vec3 BOXtexcoords[8] = vec3[8](vec3(0,1,0), vec3(1,1,0), vec3(0,0,0), vec3(1,0,0), vec3(1,1,0), vec3(1,1,0), vec3(1,1,0), vec3(1,1,0));
-
 void DrawBox(){
+	vec4 Pos = vec4(vPosition[0],1.0f);
+	vec4 Extents = vec4(vInformation[0],0.0f);
 	for (int i = 0;i < 24;i++){
-		vec4 Pos = vec4(vPosition[0],1.0f);
-		vec4 Extents = vec4(vInformation[0],0.0f);
 		gl_Position = ViewProjection * vModel[0] * (Pos + (Extents * BOXvertices[BOXindices[i]]));
 		EmitVertex();
 		if (int(mod(i,4)) == 3) { EndPrimitive(); }
@@ -60,11 +52,10 @@ const vec4 PLANEvertices[4] = vec4[4](
 	);
 const int PLANEindices[6] = int[6](0, 1, 2, 0, 2, 3);
 const vec2 PLANEtexcoords[4] = vec2[4](vec2(0,1), vec2(1,1), vec2(0,0), vec2(1,0));
-
 void DrawPlane(){
+	vec4 Pos = vec4(vPosition[0],1.0f);
+	vec4 Up = vec4(vInformation[0],0.0f);
 	for (int i = 0;i < 6;i++){
-		vec4 Pos = vec4(vPosition[0],1.0f);
-		vec4 Up = vec4(vInformation[0],0.0f);
 		gl_Position = ViewProjection * vModel[0] * (Pos + (Up * PLANEvertices[PLANEindices[i]]));
 		EmitVertex();
 		if (int(mod(i,3)) == 2) { EndPrimitive(); }
@@ -73,11 +64,10 @@ void DrawPlane(){
 // PLANE CONSTANTS
 
 // POINT CONSTANTS
-// Not actually a point, really small box
 void DrawPoint(){
+	vec4 Pos = vec4(vPosition[0],1.0f);
+	vec4 Extents = vec4(0.01f,0.01f,0.01f,0.0f);
 	for (int i = 0;i < 24;i++){
-		vec4 Pos = vec4(vPosition[0],1.0f);
-		vec4 Extents = vec4(0.01f,0.01f,0.01f,0.0f);
 		gl_Position = ViewProjection * vModel[0] * (Pos + (Extents * BOXvertices[BOXindices[i]]));
 		EmitVertex();
 		if (int(mod(i,4)) == 3) { EndPrimitive(); }
@@ -85,86 +75,83 @@ void DrawPoint(){
 }
 // POINT CONSTANTS
 
-float _PI = 3.14159;
-
 // SPHERE CONSTANTS
+const vec4 SPHEREvertices[26] = vec4[26](
+	vec4( 0.0f, 1.0f, 0.0f, 1.0f), //TOP 0
+
+	vec4(-0.5f, 0.7f, 0.0f, 1.0f), //T1 1
+	vec4(-0.3f, 0.7f, 0.3f, 1.0f), //T2 2
+	vec4( 0.0f, 0.7f, 0.5f, 1.0f), //T3 3
+	vec4( 0.3f, 0.7f, 0.3f, 1.0f), //T4 4
+	vec4( 0.5f, 0.7f, 0.0f, 1.0f), //T5 5
+	vec4( 0.3f, 0.7f,-0.3f, 1.0f), //T6 6
+	vec4( 0.0f, 0.7f,-0.5f, 1.0f), //T7 7
+	vec4(-0.3f, 0.7f,-0.3f, 1.0f), //T8 8
+
+	vec4(-1.0f, 0.0f, 0.0f, 1.0f), //M1 9
+	vec4(-0.7f, 0.0f, 0.7f, 1.0f), //M2 10
+	vec4( 0.0f, 0.0f, 1.0f, 1.0f), //M3 11
+	vec4( 0.7f, 0.0f, 0.7f, 1.0f), //M4 12
+	vec4( 1.0f, 0.0f, 0.0f, 1.0f), //M5 13
+	vec4( 0.7f, 0.0f,-0.7f, 1.0f), //M6 14
+	vec4( 0.0f, 0.0f,-1.0f, 1.0f), //M7 15
+	vec4(-0.7f, 0.0f,-0.7f, 1.0f), //M8 16
+
+	vec4(-0.5f,-0.7f, 0.0f, 1.0f), //b1 17
+	vec4(-0.3f,-0.7f, 0.3f, 1.0f), //b2 18
+	vec4( 0.0f,-0.7f, 0.5f, 1.0f), //b3 19
+	vec4( 0.3f,-0.7f, 0.3f, 1.0f), //b4 20
+	vec4( 0.5f,-0.7f, 0.0f, 1.0f), //b5 21
+	vec4( 0.3f,-0.7f,-0.3f, 1.0f), //b6 22
+	vec4( 0.0f,-0.7f,-0.5f, 1.0f), //b7 23
+	vec4(-0.3f,-0.7f,-0.3f, 1.0f), //b8 24
+
+	vec4( 0.0f,-1.0f, 0.0f, 1.0f)  //BOTTOM 25
+	);
+const int SphereIndCount = 72;
+const int SPHERETopindices[SphereIndCount] = int[SphereIndCount](
+	0, 1, 2, 0, 2, 3, 0, 3, 4, 0, 4, 5, 0, 5, 6, 0, 6, 7, 0, 7, 8, 0, 8, 1,
+	2, 1, 9 , 2, 9, 10,
+	3, 2, 10, 3 ,10 ,11,
+	4, 3, 11, 4, 11, 12,
+	5, 4, 12, 5, 12, 13,
+	6, 5, 13, 6, 13, 14,
+	7, 6, 14, 7, 14, 15,
+	8, 7, 15, 8, 15, 16,
+	1, 8, 16, 1, 16, 9
+	);
+const int SPHEREBottomindices[SphereIndCount] = int[SphereIndCount](
+	10,  9, 17, 10, 17, 18,
+	11, 10, 18, 11, 18 ,19,
+	12, 11, 19, 12, 19, 20,
+	13, 12, 20, 13, 20, 21,
+	14, 13, 21, 14, 21, 22,
+	15, 14, 22, 15, 22, 23,
+	16, 15, 23, 16, 23, 24,
+	 9, 16, 24,  9, 24, 17, 
+	25, 18, 17, 25, 19, 18, 25, 20, 19, 25, 21, 20, 25, 22, 21, 25, 23, 22, 25, 24, 23, 25, 17, 24
+	);
 void DrawSphere(){
-	
-	vec4 a_center = vec4(vPosition[0],1.0f);
-
-	float a_latMax = 90;
-	float a_latMin = -90;
-	float a_longMax = 360;
-	float a_longMin = 0;
-
-	float a_radius = vInformation[0].x;
-	float a_rows = vInformation[0].y;
-	float a_columns = vInformation[0].z;
-	int ia_columns = int(a_columns);
-
-	float inverseRadius = 1/a_radius;
-	float inverseRows = 1/a_rows;
-	float inverseColumns = 1/a_columns;
-
-	float DEG2RAD = _PI / 180;
-
-	//Lets put everything in radians first
-	float latitiudinalRange = (a_latMax - a_latMin) * DEG2RAD;
-	float longitudinalRange = (a_longMax - a_longMin) * DEG2RAD;
-
-	vec4 v4Array[512];
-
-	int count = 0;
-	for (int row = 0; row <= a_rows; ++row){
-		// y ordinates this may be a little confusing but here we are navigating around the xAxis in GL
-		float ratioAroundXAxis = float(row) * inverseRows;
-		float radiansAboutXAxis  = ratioAroundXAxis * latitiudinalRange + (a_latMin * DEG2RAD);
-		float y  =  a_radius * sin(radiansAboutXAxis);
-		float z  =  a_radius * cos(radiansAboutXAxis);
-		
-		for ( int col = 0; col <= a_columns; ++col ){
-			float ratioAroundYAxis   = float(col) * inverseColumns;
-			float theta = ratioAroundYAxis * longitudinalRange + (a_longMin * DEG2RAD);
-			vec4 v4Point = vec4( -z * sin(theta), y, -z * cos(theta),0.0f );
-			vec4 v4Normal = vec4( inverseRadius * v4Point.x, inverseRadius * v4Point.y, inverseRadius * v4Point.z,0.0f);
-
-			v4Point = vModel[0] * v4Point;
-			v4Normal = (vModel[0] * v4Normal);
-
-			int index = int(row * a_columns + (col % ia_columns));
-			v4Array[index] = v4Point;
-			if (index >= count){
-				count = index;
-			}
-		}
+	vec4 Pos = vec4(vPosition[0],1.0f);
+	vec4 Radius = vec4(vInformation[0].xxx,0.0f);
+	for (int i = 0;i < SphereIndCount; i++){
+		gl_Position = ViewProjection * vModel[0] * (Pos + (Radius * SPHEREvertices[SPHERETopindices[i]]));
+		EmitVertex();
+		if (int(mod(i,3)) == 2) { EndPrimitive(); }
 	}
-
-	for (int face = 0; face < 126; face+=3){
-		addTri( a_center + v4Array[face], a_center + v4Array[face+1], a_center + v4Array[face+2]);
+	for (int i = 0;i < SphereIndCount; i++){
+		gl_Position = ViewProjection * vModel[0] * (Pos + (Radius * SPHEREvertices[SPHEREBottomindices[i]]));
+		EmitVertex();
+		if (int(mod(i,3)) == 2) { EndPrimitive(); }
 	}
-	
-	//for (int face = 0; face < count; face++){
-	//	int iNextFace = face + 1;		
-	//	
-	//	if( iNextFace % ia_columns == 0 ){
-	//		iNextFace = iNextFace - (ia_columns);
-	//	}
-	//
-	//	if( face % ia_columns == 0 && longitudinalRange < (_PI * 2)){
-	//		continue;
-	//	}
-	//
-	//	addTri( a_center + v4Array[iNextFace+ia_columns], a_center + v4Array[face], a_center + v4Array[iNextFace]);
-	//	addTri( a_center + v4Array[iNextFace+ia_columns], a_center + v4Array[face+ia_columns], a_center + v4Array[face]);		
-	//}
 }
 // SPHERE CONSTANTS
 
 // CYLINDER CONSTANTS
 void DrawCylinder(){
+	vec4 Pos = vec4(vPosition[0],1.0f);
+	vec4 Extents = vec4(0.01f,0.01f,0.01f,0.0f);
 	for (int i = 0;i < 24;i++){
-		vec4 Pos = vec4(vPosition[0],1.0f);
-		vec4 Extents = vec4(0.01f,0.01f,0.01f,0.0f);
 		gl_Position = ViewProjection * vModel[0] * (Pos + (Extents * BOXvertices[BOXindices[i]]));
 		EmitVertex();
 		if (int(mod(i,4)) == 3) { EndPrimitive(); }
@@ -185,19 +172,82 @@ void DrawRing(){
 // RING CONSTANTS
 
 // DISK CONSTANTS
+const vec4 DISKvertices[18] = vec4[18](
+	vec4( 0.0f, 0.1f, 0.0f, 1.0f), //TOP 0
+
+	vec4(-1.0f, 0.1f, 0.0f, 1.0f), // M1 1
+	vec4(-0.7f, 0.1f, 0.7f, 1.0f), // M2 2
+	vec4( 0.0f, 0.1f, 1.0f, 1.0f), // M3 3
+	vec4( 0.7f, 0.1f, 0.7f, 1.0f), // M4 4
+ 
+	vec4( 1.0f, 0.1f, 0.0f, 1.0f), // M5 5
+	vec4( 0.7f, 0.1f,-0.7f, 1.0f), // M6 6
+	vec4( 0.0f, 0.1f,-1.0f, 1.0f), // M7 7
+	vec4(-0.7f, 0.1f,-0.7f, 1.0f), // M8 8
+ 
+	vec4(-1.0f,-0.1f, 0.0f, 1.0f), // M1 9
+	vec4(-0.7f,-0.1f, 0.7f, 1.0f), // M2 10
+	vec4( 0.0f,-0.1f, 1.0f, 1.0f), // M3 11
+	vec4( 0.7f,-0.1f, 0.7f, 1.0f), // M4 12
+ 
+	vec4( 1.0f,-0.1f, 0.0f, 1.0f), // M5 13
+	vec4( 0.7f,-0.1f,-0.7f, 1.0f), // M6 14
+	vec4( 0.0f,-0.1f,-1.0f, 1.0f), // M7 15
+	vec4(-0.7f,-0.1f,-0.7f, 1.0f), // M8 16
+
+	vec4( 0.0f,-0.1f, 0.0f, 1.0f)  //BOTTOM 17
+	);
+const int DISKIndCount = 54;
+const int DISKindices[DISKIndCount] = int[DISKIndCount](
+	0, 1, 2, 0, 2, 3, 0, 3, 4, 0, 4, 5, 0, 5, 6, 0, 6, 7, 0, 7, 8, 0, 8, 1,
+	2, 1, 9, 2, 9, 10,
+	17, 10, 9, 17, 11, 10, 17, 12, 11, 17, 13, 12, 17, 14, 13, 17, 15, 14, 17, 16, 15, 17, 9, 16
+	);
 void DrawDisk(){
-	for (int i = 0;i < 24;i++){
-		vec4 Pos = vec4(vPosition[0],1.0f);
-		vec4 Extents = vec4(0.01f,0.01f,0.01f,0.0f);
-		gl_Position = ViewProjection * vModel[0] * (Pos + (Extents * BOXvertices[BOXindices[i]]));
+	vec4 Pos = vec4(vPosition[0],1.0f);
+	vec4 Radius = vec4(vInformation[0].xxx,0.0f);
+	for (int i = 0;i < DISKIndCount; i++){
+		gl_Position = ViewProjection * vModel[0] * (Pos + (Radius * DISKvertices[DISKindices[i]]));
 		EmitVertex();
-		if (int(mod(i,4)) == 3) { EndPrimitive(); }
+		if (int(mod(i,3)) == 2) { EndPrimitive(); }
 	}
 }
 // DISK CONSTANTS
 
+// CONE CONSTANTS
+const vec4 CONEvertices[10] = vec4[10](
+	vec4( 0.0f, 1.0f, 0.0f, 1.0f), //TOP 0
+
+	vec4(-1.0f, 0.0f, 0.0f, 1.0f), //M1 1
+	vec4(-0.7f, 0.0f, 0.7f, 1.0f), //M2 2
+	vec4( 0.0f, 0.0f, 1.0f, 1.0f), //M3 3
+	vec4( 0.7f, 0.0f, 0.7f, 1.0f), //M4 4
+
+	vec4( 1.0f, 0.0f, 0.0f, 1.0f), //M5 5
+	vec4( 0.7f, 0.0f,-0.7f, 1.0f), //M6 6
+	vec4( 0.0f, 0.0f,-1.0f, 1.0f), //M7 7
+	vec4(-0.7f, 0.0f,-0.7f, 1.0f), //M8 8
+
+	vec4( 0.0f,0.0f, 0.0f, 1.0f)  //BOTTOM 9
+	);
+const int CONEIndCount = 48;
+const int CONEindices[CONEIndCount] = int[CONEIndCount](
+	0, 1, 2, 0, 2, 3, 0, 3, 4, 0, 4, 5, 0, 5, 6, 0, 6, 7, 0, 7, 8, 0, 8, 1,
+	9, 2, 1, 9, 3, 2, 9, 4, 3, 9, 5, 4, 9, 6, 5, 9, 7, 6, 9, 8, 7, 9, 1, 8
+	);
+void DrawCone(){
+	vec4 Pos = vec4(vPosition[0],1.0f);
+	vec4 Radius = vec4(vInformation[0].xxx,0.0f);
+	for (int i = 0;i < CONEIndCount; i++){
+		gl_Position = ViewProjection * vModel[0] * (Pos + (Radius * CONEvertices[CONEindices[i]]));
+		EmitVertex();
+		if (int(mod(i,3)) == 2) { EndPrimitive(); }
+	}
+}
+// CONE CONSTANTS
+
 void main(){
-	gColour = vColour[0];
+	//gColour = vColour[0];
 	switch(vID[0]){
 		case 0:
 			DrawPoint();
@@ -220,12 +270,9 @@ void main(){
 		case 6:
 			DrawDisk();
 			break;
+		case 7:
+			DrawCone();
+			break;
 	}
 }
-
-/*
-	gl_Position = ViewProjection * Position;
-	EmitVertex();
-	EndPrimitive();
-*/
 
