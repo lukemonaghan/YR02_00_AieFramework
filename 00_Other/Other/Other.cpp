@@ -32,6 +32,18 @@ bool Other::onCreate(int a_argc, char* a_argv[]) {
 	//!--TUTORIAL
 	vb = new Osiris::VertexBatch();
 	vb->SetShader(sScene->id);
+
+	vb->Add(new Osiris::Gizmo::Point(	glm::vec3( 7.0f,-1.0f,0.0f),glm::vec4(0,0,0,1) + glm::vec4(rand()%10 / 10.0f)));
+	vb->Add(new Osiris::Gizmo::Box(		glm::vec3( 5.0f,-1.0f,0.0f),glm::vec3(0.5f),glm::vec4(0,0,0,1) + glm::vec4(rand()%10 / 10.0f)));
+	vb->Add(new Osiris::Gizmo::Plane(	glm::vec3( 3.0f,-1.0f,0.0f),glm::vec3(0.5f),glm::vec4(0,0,0,1) + glm::vec4(rand()%10 / 10.0f)));
+	vb->Add(new Osiris::Gizmo::Sphere(	glm::vec3( 1.0f,-1.0f,0.0f),0.5f,3,3,glm::vec4(0,0,0,1) + glm::vec4(rand()%10 / 10.0f)));
+	vb->Add(new Osiris::Gizmo::Cylinder(glm::vec3(-1.0f,-1.0f,0.0f),0.5f,1,8,glm::vec4(0,0,0,1) + glm::vec4(rand()%10 / 10.0f)));
+	vb->Add(new Osiris::Gizmo::Ring(	glm::vec3(-3.0f,-1.0f,0.0f),0.5f,1.0f,8,glm::vec4(0,0,0,1) + glm::vec4(rand()%10 / 10.0f)));
+	vb->Add(new Osiris::Gizmo::Disk(	glm::vec3(-5.0f,-1.0f,0.0f),0.5f,16,glm::vec4(0,0,0,1) + glm::vec4(rand()%10 / 10.0f)));
+	vb->Add(new Osiris::Gizmo::Cone(	glm::vec3(-7.0f,-1.0f,0.0f),0.5f,glm::vec4(0,0,0,1) + glm::vec4(rand()%10 / 10.0f)));
+
+	vb->Update();
+
 	xNext = zNext = yNext = 0;
 	//!--TUTORIAL
 	return true;
