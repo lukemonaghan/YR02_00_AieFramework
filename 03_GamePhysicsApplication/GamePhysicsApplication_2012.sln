@@ -9,6 +9,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "03_LinearForceMomentum", "0
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "12_Ragdoll", "12_Ragdoll\12_Ragdoll.vcxproj", "{BFFC8F15-DF9F-428E-A9D1-F30332745258}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "16_SoftBodies", "16_SoftBodies\16_SoftBodies.vcxproj", "{BB9EB3CD-1501-4CA8-8876-CBC71BB433AB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -31,6 +33,10 @@ Global
 		{BFFC8F15-DF9F-428E-A9D1-F30332745258}.Debug|Win32.Build.0 = Debug|Win32
 		{BFFC8F15-DF9F-428E-A9D1-F30332745258}.Release|Win32.ActiveCfg = Release|Win32
 		{BFFC8F15-DF9F-428E-A9D1-F30332745258}.Release|Win32.Build.0 = Release|Win32
+		{BB9EB3CD-1501-4CA8-8876-CBC71BB433AB}.Debug|Win32.ActiveCfg = Debug|Win32
+		{BB9EB3CD-1501-4CA8-8876-CBC71BB433AB}.Debug|Win32.Build.0 = Debug|Win32
+		{BB9EB3CD-1501-4CA8-8876-CBC71BB433AB}.Release|Win32.ActiveCfg = Release|Win32
+		{BB9EB3CD-1501-4CA8-8876-CBC71BB433AB}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
